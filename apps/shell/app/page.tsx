@@ -4,62 +4,49 @@ import { useState } from "react";
 import { TopBar } from "../src/components/top-bar";
 import { DesktopArea } from "../src/components/desktop-area";
 import { Dock } from "../src/components/dock";
-import type { AppManifest, OpenedApp } from "@repo/contracts";
-
-const REGISTRY: AppManifest[] = [
-  {
-    appId: "deploy-list-app",
-    name: "Deploy List",
-    description: "Lista e acompanha deploys",
-    icon: "📋",
-    url: process.env.NEXT_PUBLIC_DEPLOY_LIST_APP_URL ?? "http://localhost:3001",
-    requiredPermissions: ["deploy:view"],
-    defaultWindowSize: { width: 720, height: 480 },
-  },
-  {
-    appId: "deploy-runner-app",
-    name: "Deploy Runner",
-    description: "Executa deploys com segurança",
-    icon: "🚀",
-    url:
-      process.env.NEXT_PUBLIC_DEPLOY_RUNNER_APP_URL ?? "http://localhost:3002",
-    requiredPermissions: ["deploy:view", "deploy:execute"],
-    defaultWindowSize: { width: 640, height: 520 },
-  },
-];
+import { PermissionsPanel } from "../src/features/permissions/permissions-panel";
+import { useShellState } from "../src/features/shell-state/shell-context";
+import { appRegistry } from "../src/features/apps/app-registry";
 
 export default function BrowserOSPage() {
-  const [openedApps, setOpenedApps] = useState<OpenedApp[]>([]);
+  const { state, dispatch } = useShellState();
+  const [showPermissions, setShowPermissions] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
 
   function openApp(appId: string) {
-    const already = openedApps.find((a) => a.appId === appId);
+    const manifest = appRegistry.find((m) => m.appId === appId);
+    if (!manifest) return;
+    const already = state.openedApps.find((a) => a.appId === appId);
     if (already) return;
-    setOpenedApps((prev) => [
-      ...prev,
-      {
-        appId: appId as OpenedApp["appId"],
+    dispatch({
+      type: "ADD_OPENED_APP",
+      payload: {
+        appId: manifest.appId,
         windowId: `${appId}-${Date.now()}`,
         openedAt: Date.now(),
       },
-    ]);
+    });
   }
 
   return (
     <div className="relative h-screen w-screen flex flex-col overflow-hidden">
       <TopBar
-        userName="Lucas"
+        userName={state.currentUser.name}
         environment="staging"
-        notificationCount={0}
+        notificationCount={state.notifications.length}
         onNotificationClick={() => setShowNotifications((v) => !v)}
-        onPermissionsClick={() => {}}
+        onPermissionsClick={() => setShowPermissions((v) => !v)}
       />
 
-      <DesktopArea apps={REGISTRY} onOpenApp={openApp} />
+      <DesktopArea apps={appRegistry} onOpenApp={openApp} />
+
+      {showPermissions && (
+        <PermissionsPanel onClose={() => setShowPermissions(false)} />
+      )}
 
       <Dock
-        apps={REGISTRY}
-        openedApps={openedApps}
+        apps={appRegistry}
+        openedApps={state.openedApps}
         onAppClick={openApp}
         onNotificationClick={() => setShowNotifications((v) => !v)}
       />

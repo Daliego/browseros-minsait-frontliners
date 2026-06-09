@@ -5,6 +5,7 @@ import { TopBar } from "../src/components/top-bar";
 import { DesktopArea } from "../src/components/desktop-area";
 import { Dock } from "../src/components/dock";
 import { PermissionsPanel } from "../src/features/permissions/permissions-panel";
+import { NotificationsPanel } from "../src/features/notifications/notifications-panel";
 import { useShellState } from "../src/features/shell-state/shell-context";
 import { useWindowManager } from "../src/features/window-manager/use-window-manager";
 import { useMessageBus } from "../src/features/message-bus/use-message-bus";
@@ -34,6 +35,11 @@ export default function BrowserOSPage() {
       {showPermissions && (
         <PermissionsPanel onClose={() => setShowPermissions(false)} />
       )}
+
+      <NotificationsPanel
+        isOpen={showNotifications}
+        onClose={() => setShowNotifications(false)}
+      />
 
       <Dock
         apps={appRegistry}

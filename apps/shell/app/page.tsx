@@ -7,13 +7,17 @@ import { Dock } from "../src/components/dock";
 import { PermissionsPanel } from "../src/features/permissions/permissions-panel";
 import { useShellState } from "../src/features/shell-state/shell-context";
 import { useWindowManager } from "../src/features/window-manager/use-window-manager";
+import { useMessageBus } from "../src/features/message-bus/use-message-bus";
 import { appRegistry } from "../src/features/apps/app-registry";
+import type { AppId } from "@repo/contracts";
 
 export default function BrowserOSPage() {
   const { state } = useShellState();
-  const { openApp } = useWindowManager();
+  const { openApp, getIframe } = useWindowManager();
   const [showPermissions, setShowPermissions] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+
+  useMessageBus(openApp, getIframe as (appId: AppId) => HTMLIFrameElement | undefined);
 
   return (
     <div className="relative h-screen w-screen flex flex-col overflow-hidden">

@@ -6,27 +6,14 @@ import { DesktopArea } from "../src/components/desktop-area";
 import { Dock } from "../src/components/dock";
 import { PermissionsPanel } from "../src/features/permissions/permissions-panel";
 import { useShellState } from "../src/features/shell-state/shell-context";
+import { useWindowManager } from "../src/features/window-manager/use-window-manager";
 import { appRegistry } from "../src/features/apps/app-registry";
 
 export default function BrowserOSPage() {
-  const { state, dispatch } = useShellState();
+  const { state } = useShellState();
+  const { openApp } = useWindowManager();
   const [showPermissions, setShowPermissions] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-
-  function openApp(appId: string) {
-    const manifest = appRegistry.find((m) => m.appId === appId);
-    if (!manifest) return;
-    const already = state.openedApps.find((a) => a.appId === appId);
-    if (already) return;
-    dispatch({
-      type: "ADD_OPENED_APP",
-      payload: {
-        appId: manifest.appId,
-        windowId: `${appId}-${Date.now()}`,
-        openedAt: Date.now(),
-      },
-    });
-  }
 
   return (
     <div className="relative h-screen w-screen flex flex-col overflow-hidden">

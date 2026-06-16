@@ -1,159 +1,138 @@
-# Turborepo starter
+# BrowserOS
 
-This Turborepo starter is maintained by the Turborepo core team.
+A conference demo showing microfrontends beyond the typical e-commerce use case. BrowserOS simulates an in-browser operating system: the **shell** opens microfrontend apps as floating WinBox windows containing iframes, and orchestrates all permissions, state, and communication via `window.postMessage`.
 
-## Using this example
+> Built for a ~50-minute talk on microfrontends in non-conventional contexts (ERPs, CRMs, hospital systems, deploy tooling).
 
-Run the following command:
+---
 
-```sh
-npx create-turbo@latest
+## Architecture
+
+```
+┌─────────────────── Shell (localhost:3000) ──────────────────────┐
+│                                                                   │
+│  App Registry  ──►  WinBox Window Manager  ──►  iframes          │
+│                                                                   │
+│  Shell State (React Context)                                      │
+│    currentUser, permissions, policy, openedApps, notifications    │
+│                                                                   │
+│  Message Bus (window.addEventListener)                            │
+│    APP_READY → SET_APP_CONTEXT                                    │
+│    OPEN_APP_REQUESTED → opens new window                          │
+│    DEPLOY_STARTED/DONE/REJECTED → DEPLOY_STATUS_UPDATED          │
+│    PUSH_NOTIFICATION → Sonner toast + history panel              │
+└───────────┬─────────────────────────────┬─────────────────────────┘
+            │ iframe                      │ iframe
+            ▼                             ▼
+  Deploy List App (3001)       Deploy Runner App (3002)
 ```
 
-## What's inside?
+Communication is strictly: **Microfrontend → Shell → Microfrontend**. Apps never talk directly.
 
-This Turborepo includes the following packages/apps:
+---
 
-### Apps and Packages
+## Stack
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+| Layer | Technology |
+|-------|-----------|
+| Monorepo | Turborepo + pnpm workspaces |
+| Apps | Next.js 16 + React 19 + TypeScript |
+| Windowing | WinBox.js (floating windows) |
+| Communication | `window.postMessage` + type guards |
+| Styling | Tailwind v4 + OKLch tokens + shadcn/ui |
+| Notifications | Sonner |
+| Shared types | `packages/contracts` |
+| Shared UI | `packages/ui` |
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+---
 
-### Utilities
+## Getting Started
 
-This Turborepo has some additional tools already setup for you:
+```bash
+# Requires pnpm (https://pnpm.io)
+npm install -g pnpm
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+# Install dependencies
+pnpm install
 
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo build
+# Start all three apps simultaneously
+pnpm dev
 ```
 
-Without global `turbo`, use your package manager:
+**Ports:**
 
-```sh
-cd my-turborepo
-npx turbo build
-npm dlx turbo build
-npm exec turbo build
+| App | URL |
+|-----|-----|
+| Shell | http://localhost:3000 |
+| Deploy List App | http://localhost:3001 |
+| Deploy Runner App | http://localhost:3002 |
+
+**Environment variables:** Copy `.env.example` to `apps/shell/.env.local`. Defaults already point to localhost — no changes needed for local dev.
+
+---
+
+## postMessage Event Reference
+
+### Microfrontend → Shell
+
+| Type | Payload | Description |
+|------|---------|-------------|
+| `APP_READY` | `{ appId }` | Sent on mount; triggers `SET_APP_CONTEXT` |
+| `OPEN_APP_REQUESTED` | `{ appId, params? }` | Ask shell to open another app |
+| `PUSH_NOTIFICATION` | `{ title, message, variant }` | Show a global toast |
+| `DEPLOY_STARTED` | `{ deployId }` | Deploy simulation began |
+| `DEPLOY_DONE` | `{ deployId }` | Deploy finished successfully |
+| `DEPLOY_REJECTED` | `{ deployId, reason }` | Deploy was blocked |
+
+### Shell → Microfrontend
+
+| Type | Payload | Description |
+|------|---------|-------------|
+| `SET_APP_CONTEXT` | `{ appId, user, permissions, policy, currentDeployId? }` | Context pushed after `APP_READY` |
+| `DEPLOY_STATUS_UPDATED` | `{ deployId, status }` | Status change broadcast to Deploy List |
+
+---
+
+## Permission Model
+
+```typescript
+type AppPermission = "deploy:view" | "deploy:write" | "deploy:execute";
+
+// Default permissions
+"deploy-list-app":  ["deploy:view", "deploy:write"]
+"deploy-runner-app": ["deploy:view", "deploy:execute"]
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+The **Permissions panel** (top bar → shield icon) lets you toggle any permission in real time during the demo.
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+---
 
-```sh
-turbo build --filter=docs
-```
+## Friday Mode
 
-Without global `turbo`:
+Toggle **Simular Sexta-feira** in the Permissions panel. Next time Deploy Runner receives `SET_APP_CONTEXT`, `policy.simulateFriday` will be `true`. Clicking "Iniciar deploy" immediately emits `DEPLOY_REJECTED` with the message:
 
-```sh
-npx turbo build --filter=docs
-npm exec turbo build --filter=docs
-npm exec turbo build --filter=docs
-```
+> "Deploy na sexta-feira detectado. O BrowserOS bloqueou essa tentativa por motivos de paz coletiva."
 
-### Develop
+**Demo tip:** Toggle Friday mode _before_ opening a new Deploy Runner window — context is delivered on `APP_READY`, not continuously.
 
-To develop all apps and packages, run the following command:
+---
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+## AI Rules & Skills
 
-```sh
-cd my-turborepo
-turbo dev
-```
+- **`AI_RULES.md`** — Architecture constraints for AI-assisted development
+- **`skills/create-microfrontend.md`** — Prompt to scaffold a new microfrontend
+- **`skills/create-shell-feature.md`** — Prompt to add event handlers, permissions, or UI panels
 
-Without global `turbo`, use your package manager:
+---
 
-```sh
-cd my-turborepo
-npx turbo dev
-npm exec turbo dev
-npm exec turbo dev
-```
+## Demo Script (5 steps)
 
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo dev --filter=web
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo dev --filter=web
-npm exec turbo dev --filter=web
-npm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo login
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo login
-npm exec turbo login
-npm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-npm exec turbo link
-npm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+1. **Open the shell** at localhost:3000. Show the desktop with app cards and the dock.
+2. **Open Deploy List App** — click the 📋 card. A WinBox window opens with the iframe.
+   - In devtools Network/Console, show `APP_READY` → `SET_APP_CONTEXT` flowing.
+3. **Click "Novo Deploy"** — the Deploy List sends `OPEN_APP_REQUESTED`. Shell opens Deploy Runner.
+   - Show `SET_APP_CONTEXT` arriving with `deploy:execute` permission → button enables.
+4. **Click "Iniciar deploy"** — watch the pipeline steps animate. Toasts appear.
+   - Back in Deploy List: the row status updates to `running` then `done` in real time.
+5. **Enable Friday mode** (Permissions panel → Simular Sexta-feira). Open a new deploy.
+   - Immediate rejection with the Friday message. Error toast. Row shows `rejected`.

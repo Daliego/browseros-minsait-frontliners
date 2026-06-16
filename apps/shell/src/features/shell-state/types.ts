@@ -25,7 +25,7 @@ export type Notification = {
 
 export type ShellState = {
   currentUser: User;
-  permissions: Record<AppId, AppPermission[]>;
+  permissions: Partial<Record<AppId, AppPermission[]>>;
   openedApps: OpenedApp[];
   deploys: Deploy[];
   notifications: Notification[];

@@ -83,6 +83,7 @@ const baseState: ShellState = {
   deploys: [],
   notifications: [],
   policy: { simulateFriday: false },
+  pendingDeployId: null,
 };
 
 describe("can() guard", () => {

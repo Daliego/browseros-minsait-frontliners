@@ -32,7 +32,7 @@ export function createMessageHandler(
         onAppReady(msg, state, dispatch, getIframe);
         break;
       case "OPEN_APP_REQUESTED":
-        onOpenAppRequested(msg, state, openApp);
+        onOpenAppRequested(msg, state, openApp, dispatch);
         break;
       case "PUSH_NOTIFICATION":
         onPushNotification(msg, dispatch);

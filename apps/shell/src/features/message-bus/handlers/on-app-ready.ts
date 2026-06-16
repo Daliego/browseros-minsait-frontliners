@@ -1,6 +1,5 @@
 import type { AppReadyMessage, AppId } from "@repo/contracts";
-import type { ShellState } from "../../shell-state/types";
-import type { ShellAction } from "../../shell-state/types";
+import type { ShellState, ShellAction } from "../../shell-state/types";
 import type { Dispatch } from "react";
 import { sendToApp } from "../send-to-app";
 
@@ -13,17 +12,17 @@ export function onAppReady(
   const { appId } = message.payload;
   const permissions = state.permissions[appId] ?? [];
 
-  sendToApp(
+  const payload: Parameters<typeof sendToApp>[1]["payload"] = {
     appId,
-    {
-      type: "SET_APP_CONTEXT",
-      payload: {
-        appId,
-        user: state.currentUser,
-        permissions,
-        policy: state.policy,
-      },
-    },
-    getIframe
-  );
+    user: state.currentUser,
+    permissions,
+    policy: state.policy,
+  };
+
+  if (appId === "deploy-runner-app" && state.pendingDeployId) {
+    payload.currentDeployId = state.pendingDeployId;
+    dispatch({ type: "SET_PENDING_DEPLOY_ID", payload: { deployId: null } });
+  }
+
+  sendToApp(appId, { type: "SET_APP_CONTEXT", payload }, getIframe);
 }

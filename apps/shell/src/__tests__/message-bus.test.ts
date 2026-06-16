@@ -23,6 +23,7 @@ function makeState(overrides?: Partial<ShellState>): ShellState {
     ],
     notifications: [],
     policy: { simulateFriday: false },
+    pendingDeployId: null,
     ...overrides,
   };
 }

@@ -2,22 +2,29 @@ import type { AppManifest, AppId } from "@repo/contracts";
 import type { OpenedAppEntry } from "./types";
 import type { ShellAction } from "../shell-state/types";
 import type { Dispatch } from "react";
+import { MapPinOffIcon } from "lucide-react";
 
 export async function openAppWindow(
   manifest: AppManifest,
   currentEntries: OpenedAppEntry[],
   dispatch: Dispatch<ShellAction>,
-  onEntryCreated: (entry: OpenedAppEntry) => void
+  onEntryCreated: (entry: OpenedAppEntry) => void, 
+  onEntryClosed: (appId: AppId) => void
 ): Promise<void> {
   // Dedup: focus existing window if already open
   const existing = currentEntries.find((e) => e.appId === manifest.appId);
   if (existing) {
+    console.log('focus window', existing)
     existing.winbox.focus();
     return;
   }
 
-  const WinBox = (await import("winbox")).default;
 
+
+  await import("winbox");
+  // The browser field in winbox's package.json resolves to dist/winbox.bundle.min.js,
+  // an IIFE that sets window.WinBox instead of exporting a default. Read the global directly.
+  const WinBox = (window as unknown as { WinBox: typeof import("winbox").default }).WinBox;
   const iframe = document.createElement("iframe");
   iframe.src = manifest.url;
   iframe.style.cssText =
@@ -44,6 +51,9 @@ export async function openAppWindow(
         type: "REMOVE_OPENED_APP",
         payload: { appId: manifest.appId },
       });
+
+      onEntryClosed(manifest.appId)
+
       return false;
     },
   });

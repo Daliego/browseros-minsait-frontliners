@@ -45,6 +45,7 @@ const INITIAL_STATE: ShellState = {
   permissions: {
     "deploy-list-app": ["deploy:view", "deploy:write"],
     "deploy-runner-app": ["deploy:view", "deploy:execute"],
+    "portifolio-app": ["*"],
   },
   openedApps: [],
   deploys: DEFAULT_DEPLOYS,

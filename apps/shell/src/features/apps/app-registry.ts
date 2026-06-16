@@ -21,4 +21,14 @@ export const appRegistry: AppManifest[] = [
     requiredPermissions: ["deploy:view", "deploy:execute"],
     defaultWindowSize: { width: 640, height: 520 },
   },
+  {
+    appId: "portifolio-app",
+    name: "Portifolio",
+    description: "Abre a url do meu portifólio",
+    icon: "📚",
+    url:
+      "https://daliego.github.io/portfolio-case-studies/",
+    requiredPermissions: ["deploy:view", "deploy:execute"],
+    defaultWindowSize: { width: 640, height: 520 },
+  },
 ];

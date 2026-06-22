@@ -31,4 +31,22 @@ export const appRegistry: AppManifest[] = [
     requiredPermissions: ["deploy:view", "deploy:execute"],
     defaultWindowSize: { width: 640, height: 520 },
   },
+  {
+    appId: "google",
+    name: "Google",
+    description: "Abre o Google no navegador",
+    icon: "🔍",
+    url: "https://www.google.com",
+    requiredPermissions: ["*"],
+    defaultWindowSize: { width: 800, height: 600 },
+  },
+  {
+    appId: "minecraft",
+    name: "Minecraft",
+    description: "Abre o site do Minecraft no navegador",
+    icon: "⛏️",
+    url: "https://www.minecraft.net/pt-br",
+    requiredPermissions: ["*"],
+    defaultWindowSize: { width: 800, height: 600 },
+  },
 ];

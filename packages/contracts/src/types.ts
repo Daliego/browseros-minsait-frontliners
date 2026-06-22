@@ -1,4 +1,4 @@
-export type AppId = "deploy-list-app" | "deploy-runner-app" | "portifolio-app";
+export type AppId = "deploy-list-app" | "deploy-runner-app" | "portifolio-app" | "google" | "minecraft";
 
 export type AppPermission =
   | "deploy:view"

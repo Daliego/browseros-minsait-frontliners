@@ -46,6 +46,8 @@ const INITIAL_STATE: ShellState = {
     "deploy-list-app": ["deploy:view", "deploy:write"],
     "deploy-runner-app": ["deploy:view", "deploy:execute"],
     "portifolio-app": ["*"],
+    "google": ["*"],
+    "minecraft": ["*"],
   },
   openedApps: [],
   deploys: DEFAULT_DEPLOYS,

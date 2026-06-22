@@ -17,6 +17,7 @@ const ALLOWED_ORIGINS = new Set([
 export function createMessageHandler(
   getState: () => ShellState,
   dispatch: Dispatch<ShellAction>,
+  
   openApp: (appId: AppId | string) => void,
   getIframe: (appId: AppId) => HTMLIFrameElement | undefined
 ) {

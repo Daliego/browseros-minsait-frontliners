@@ -8,7 +8,7 @@ export async function openAppWindow(
   manifest: AppManifest,
   currentEntries: OpenedAppEntry[],
   dispatch: Dispatch<ShellAction>,
-  onEntryCreated: (entry: OpenedAppEntry) => void, 
+  onEntryCreated: (entry: OpenedAppEntry) => void,
   onEntryClosed: (appId: AppId) => void
 ): Promise<void> {
   // Dedup: focus existing window if already open
@@ -18,8 +18,6 @@ export async function openAppWindow(
     existing.winbox.focus();
     return;
   }
-
-
 
   await import("winbox");
   // The browser field in winbox's package.json resolves to dist/winbox.bundle.min.js,

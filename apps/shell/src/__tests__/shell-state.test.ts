@@ -65,7 +65,7 @@ function shellReducer(state: ShellState, action: ShellAction): ShellState {
 }
 
 function can(
-  permissions: Record<AppId, AppPermission[]>,
+  permissions: Partial<Record<AppId, AppPermission[]>>,
   appId: AppId,
   permission: AppPermission
 ): boolean {
@@ -77,11 +77,13 @@ const baseState: ShellState = {
   permissions: {
     "deploy-list-app": ["deploy:view", "deploy:write"],
     "deploy-runner-app": ["deploy:view", "deploy:execute"],
+    "portifolio-app": ["*"],
   },
   openedApps: [],
   deploys: [],
   notifications: [],
   policy: { simulateFriday: false },
+  pendingDeployId: null,
 };
 
 describe("can() guard", () => {

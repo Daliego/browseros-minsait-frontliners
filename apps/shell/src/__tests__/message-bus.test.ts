@@ -9,6 +9,7 @@ function makeState(overrides?: Partial<ShellState>): ShellState {
     permissions: {
       "deploy-list-app": ["deploy:view", "deploy:write"],
       "deploy-runner-app": ["deploy:view", "deploy:execute"],
+      "portifolio-app": ["*"],
     },
     openedApps: [],
     deploys: [
@@ -22,6 +23,7 @@ function makeState(overrides?: Partial<ShellState>): ShellState {
     ],
     notifications: [],
     policy: { simulateFriday: false },
+    pendingDeployId: null,
     ...overrides,
   };
 }
@@ -133,6 +135,7 @@ describe("createMessageHandler", () => {
       permissions: {
         "deploy-list-app": [],
         "deploy-runner-app": [],
+        "portifolio-app": ["*"],
       },
     });
     const handler = createMessageHandler(

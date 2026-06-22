@@ -21,8 +21,11 @@ export function useWindowManager() {
         dispatch,
         (entry) => {
           entriesRef.current = [...entriesRef.current, entry];
+        }, (appId) => {
+          entriesRef.current = entriesRef.current.filter((e) => e.appId !== appId);
         }
       );
+
     },
     [dispatch]
   );

@@ -45,11 +45,15 @@ const INITIAL_STATE: ShellState = {
   permissions: {
     "deploy-list-app": ["deploy:view", "deploy:write"],
     "deploy-runner-app": ["deploy:view", "deploy:execute"],
+    "portifolio-app": ["*"],
+    "google": ["*"],
+    "minecraft": ["*"],
   },
   openedApps: [],
   deploys: DEFAULT_DEPLOYS,
   notifications: [],
   policy: { simulateFriday: false },
+  pendingDeployId: null,
 };
 
 function shellReducer(state: ShellState, action: ShellAction): ShellState {
@@ -115,6 +119,9 @@ function shellReducer(state: ShellState, action: ShellAction): ShellState {
           simulateFriday: !state.policy.simulateFriday,
         },
       };
+
+    case "SET_PENDING_DEPLOY_ID":
+      return { ...state, pendingDeployId: action.payload.deployId };
 
     default:
       return state;

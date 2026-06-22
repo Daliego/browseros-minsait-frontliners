@@ -17,6 +17,7 @@ const ALLOWED_ORIGINS = new Set([
 export function createMessageHandler(
   getState: () => ShellState,
   dispatch: Dispatch<ShellAction>,
+  
   openApp: (appId: AppId | string) => void,
   getIframe: (appId: AppId) => HTMLIFrameElement | undefined
 ) {
@@ -32,7 +33,7 @@ export function createMessageHandler(
         onAppReady(msg, state, dispatch, getIframe);
         break;
       case "OPEN_APP_REQUESTED":
-        onOpenAppRequested(msg, state, openApp);
+        onOpenAppRequested(msg, state, openApp, dispatch);
         break;
       case "PUSH_NOTIFICATION":
         onPushNotification(msg, dispatch);

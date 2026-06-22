@@ -1,3 +1,7 @@
+// The npm package's "browser" field resolves to an IIFE bundle (dist/winbox.bundle.min.js)
+// that sets window.WinBox rather than exporting a default. The default export typed here
+// is only used as a type reference via typeof import("winbox").default — do not use
+// (await import("winbox")).default at runtime; read window.WinBox instead.
 declare module "winbox" {
   interface WinBoxOptions {
     title?: string;

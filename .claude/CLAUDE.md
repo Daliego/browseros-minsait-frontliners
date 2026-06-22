@@ -244,6 +244,11 @@ Microfrontends importam contratos deste pacote. Nunca duplicar tipos entre apps.
 - Não usar Module Federation, single-spa, backend real ou banco de dados
 - Não adicionar persistência avançada, autenticação real ou segurança avançada de iframe
 
+### Skills — consultar antes de agir
+
+- **Ao adicionar um novo app ou microfrontend ao shell:** MUST ler `.claude/skills/create-microfrontend.md` e executar todos os itens do checklist atomicamente antes de qualquer edição.
+- **Ao adicionar um novo handler de postMessage, permissão ou painel no shell:** MUST ler `.claude/skills/create-shell-feature.md` primeiro.
+
 ---
 
 ## Requisitos — MVP
